@@ -18,7 +18,7 @@ The idea in one paragraph: an agent should read a short entrypoint, a short memo
 **Claude Code (terminal):**
 
 ```
-/plugin marketplace add kevincabrera/cowork
+/plugin marketplace add cabrerakevinc/cowork-skill
 /plugin install cowork
 ```
 
