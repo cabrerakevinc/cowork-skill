@@ -1,0 +1,65 @@
+name: Release
+
+# Runs when you push a tag like v0.2.0. Checks the version everywhere matches the tag,
+# builds cowork.plugin from the cowork/ folder, and publishes a GitHub Release with the
+# changelog section for that version and the .plugin attached.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check versions match the tag
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PLUGIN=$(python3 -c "import json;print(json.load(open('cowork/.claude-plugin/plugin.json'))['version'])")
+          MARKET=$(python3 -c "import json;print(json.load(open('.claude-plugin/marketplace.json'))['plugins'][0]['version'])")
+          echo "tag=$TAG plugin.json=$PLUGIN marketplace.json=$MARKET"
+          [ "$TAG" = "$PLUGIN" ] && [ "$TAG" = "$MARKET" ] || { echo "::error::version mismatch; bump both JSON files to $TAG before tagging"; exit 1; }
+          grep -q "^## \[$TAG\]" CHANGELOG.md || { echo "::error::CHANGELOG.md has no '## [$TAG]' section"; exit 1; }
+
+      - name: Validate plugin structure
+        run: |
+          python3 - <<'PY'
+          import json, re, pathlib
+          d = json.load(open("cowork/.claude-plugin/plugin.json"))
+          assert re.fullmatch(r"[a-z0-9-]+", d["name"]), "plugin name must be kebab-case"
+          skills = list(pathlib.Path("cowork/skills").glob("*/SKILL.md"))
+          assert skills, "no skills found"
+          for s in skills:
+              t = s.read_text()
+              m = re.match(r"^---\n(.*?)\n---\n", t, re.S)
+              assert m and "name:" in m.group(1) and "description:" in m.group(1), f"{s}: bad frontmatter"
+          print(f"ok: {d['name']} v{d['version']}, {len(skills)} skills")
+          PY
+          python3 -m py_compile cowork/skills/doctor/scripts/*.py
+
+      - name: Build cowork.plugin
+        run: |
+          cd cowork && zip -rq ../cowork.plugin . -x "*.DS_Store" -x "*__pycache__*"
+          cd .. && unzip -l cowork.plugin | tail -1
+
+      - name: Extract changelog section
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          awk -v tag="$TAG" '
+            /^## \[/ { if (found) exit; if (index($0, "[" tag "]")) { found=1; next } }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          echo "---"; cat release-notes.md
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" cowork.plugin \
+            --title "cowork $GITHUB_REF_NAME" \
+            --notes-file release-notes.md

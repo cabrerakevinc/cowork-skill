@@ -62,8 +62,7 @@ Projects never contain plugin code, so updating the plugin (`/plugin marketplace
 
 ## Changelog
 
-- **0.2.0** (conventions 1.1): projects inside workstations (`Projects/<slug>/PROJECT.md` with an archive step), workstation-scoped tooling, tooling interview prefilled from detected tools and `~/.cowork/tooling-defaults.md`, optional root resources at bootstrap (voice principles, briefing template), `bootstrap upgrade` and `bootstrap adopt`, doctor fleet mode (`--all`, `--roots`), doctor never crosses nested git repos, `.coworkignore`, or `.gitignore`d paths, minor conventions mismatch is a note instead of a warning.
-- **0.1.0** (conventions 1.0): bootstrap, extend, doctor, end-session.
+See `CHANGELOG.md` at the repository root; each GitHub Release carries its section.
 
 ## License
 
