@@ -1,6 +1,6 @@
 # Cowork OS conventions
 
-<!-- cowork-os-conventions v1.1 -->
+<!-- cowork-os-conventions v1.0 -->
 
 The rules of the *structure*, not the rules of any project. Read this before creating a workstation, rule, agent, skill, or resource. The doctor (`/cowork:doctor`, shipped in the `cowork` plugin) audits against this file; the version line above lets it tell when a project's copy is behind.
 
@@ -23,12 +23,9 @@ MEMORY.md                      Active Projects / Core Memory / Archive
 00_Agents/<name>.md            delegated personas, listed in the Agents table (optional)
 <Name> HQ/                     one workstation per recurring kind of work
   CLAUDE.md                    Identity / Resources / Workflow / Editorial Rules
-  MEMORY.md                    Contacts / Key Decisions (+ Active Projects / Archive if it has projects, + an index if the domain grows per-topic)
-  <Name> HQ Resources/         local files, skills, tooling.md, rules/, agents/, nested units; listed in that CLAUDE.md's Resources table
-  Projects/<slug>/PROJECT.md   time-bound work inside the workstation (optional; see Creating a project)
+  MEMORY.md                    Contacts / Key Decisions (+ an index section if the domain grows per-topic)
+  <Name> HQ Resources/         local files, skills, and nested units, listed in that CLAUDE.md's Resources table
 ```
-
-Folders the structure does not own are invisible to it: any nested git repository, anything listed in a root `.coworkignore` (one glob per line), anything the root `.gitignore` ignores, and output folders. Put cloned repos, data dumps, and vendored code there and the doctor will not audit them.
 
 Workstation folders may nest (a subject under a study HQ, a workspace under a chat HQ). A nested unit has its own CLAUDE.md and MEMORY.md, is created from a template on first use, and is listed in a table in its parent's CLAUDE.md.
 
@@ -51,16 +48,6 @@ Trigger: a kind of work recurs and has its own vocabulary, contacts, or rules. C
 4. A row in the root Routing Map, and one dated bullet in the root MEMORY.md Active Projects saying the workstation exists and what it is for. Then run the doctor.
 
 Before writing a rule into a workstation CLAUDE.md, check the root. If it already exists there and applies workspace-wide, reference it instead of repeating it.
-
-## Creating a project
-
-Trigger: a piece of work inside a workstation has a start and an end (a client engagement, a migration, a campaign, a paper). A workstation is durable; a project is not. Create `<Name> HQ/Projects/<slug>/` with:
-
-1. `PROJECT.md`, at most 60 lines, sections **Brief** (what, for whom, done-when, in one paragraph), **Status** (one line: `Active since <date>` or `Archived <date>: <outcome>`), **Log** (dated one-liners, newest first, at most ~20; older lines move to a `log-archive.md` beside it).
-2. Working files beside it, freely. They are project scope, not workstation Resources, so they need no table rows; the project folder itself is the unit that is tracked.
-3. A bullet in the workstation `MEMORY.md` under **Active Projects**, shaped `- <date>: <slug>, <one-line brief>. → \`Projects/<slug>/\``. On the first project, add **Active Projects** and **Archive** as sections after Key Decisions (order: Contacts, Key Decisions, Active Projects, Archive, then any index sections); an empty section holds `*(None.)*`. Cap 10 active. Nothing in the root MEMORY.md unless the project matters across workstations.
-
-Closing a project: set Status to `Archived <date>: <outcome>`, add a Log line `- <date>: archived, <outcome>.`, move the memory bullet to **Archive** reworded `- <date>: <slug> archived, <outcome>.`, leave the folder in place. Never delete. Anything learned that outlives the project goes to Key Decisions or a Resources file, not into the archived bullet.
 
 ## Creating a scoped rule
 
@@ -97,13 +84,7 @@ Trigger: a procedure with steps, templates, or scripts that will be repeated. Cr
 
 ## Tooling
 
-Trigger: the project has more than one tool or MCP for the same job, or a tool that must be used carefully. "Tool" means anything the agent chooses between to get work done: a CLI, an MCP server, an external API, a build or test runner, a terminal multiplexer. Create `00_Resources/tooling.md` as a table `Tool | Use when... | Do not use when...`, one row per tool, at most 40 lines, and add the References row `| tooling.md | ...choosing between tools for infra, tickets, docs, APIs, or terminals |`. Tool-specific *rules* (read-only on prod) go in a scoped rule file, not here.
-
-A workstation whose tools differ from the root's (an automation lab on n8n and Supabase, a research desk on a CRM) keeps its own `<Name> HQ Resources/tooling.md` with the same table shape, listed in its Resources table with the trigger "choosing a tool for this workstation's work". Root tooling covers what every workstation shares; workstation tooling covers only what is specific there, and never repeats a root row.
-
-## Keeping a workspace current
-
-This file is versioned (line 3). The doctor compares it with the plugin's copy: a newer *minor* version means additive procedures like this one were added and nothing you have is wrong; `/cowork:bootstrap upgrade` replaces this file when convenient. A newer *major* version means a cap or file shape changed, and the doctor warns until you upgrade. Upgrade replaces this file only when it matches a version the plugin has shipped; a locally edited copy is never overwritten without asking. A workspace that predates the plugin (an existing Cowork OS) gets this file, and nothing else, from `/cowork:bootstrap adopt`. Do not edit this file by hand; if a convention needs to change, change it in the plugin so every workspace gets it.
+Trigger: the project has more than one tool or MCP for the same job, or a tool that must be used carefully. Create `00_Resources/tooling.md` as a table `Tool | Use when... | Do not use when...`, one row per tool, under 40 lines, and add a References row "choosing between tools for infra, tickets, docs, or terminals". Tool-specific *rules* (read-only on prod) go in a scoped rule file, not here.
 
 ## Size caps
 
@@ -120,9 +101,7 @@ All caps are inclusive: at most this many.
 | 00_Resources/rules/*.md | 15 lines, 2 per rule |
 | 00_Agents/*.md | 60 lines |
 | Any SKILL.md | 200 lines |
-| tooling.md (root or workstation) | 40 lines |
-| PROJECT.md | 60 lines |
-| Workstation Active Projects | 10 bullets |
+| tooling.md | 40 lines |
 | Any frontmatter description | 1 line, 200 chars |
 
 ## Reachability
@@ -132,6 +111,6 @@ Every file under `00_Resources/`, `00_Agents/`, and every `<Name> HQ Resources/`
 ## Hygiene
 
 - Generated deliverables never land in this workspace (root Rules). Logging that they were generated does.
-- No secret-shaped strings in any file the structure owns. Point to the vault or env var name.
+- No secret-shaped strings in any file. Point to the vault or env var name.
 - `Last updated:` moves on every MEMORY.md edit.
 - Run `/cowork:doctor` after creating anything listed above.

@@ -54,7 +54,7 @@ Files in 00_Resources. Load only when the trigger fires.
 |---|---|
 | cowork-os-conventions.md | Creating or changing a workstation, rule, agent, skill, or resource; deciding where something belongs |
 
-<!-- slot: typical next rows are voice-principles.md (writing on my behalf), personal-info.md (bios, forms), tooling.md (choosing between tools/MCPs) -->
+<!-- slot: typical next rows are voice-principles.md (writing any content on my behalf), briefing-template.md (any status update, research answer, or summary), personal-info.md (bios, forms), tooling.md (choosing between tools/MCPs) -->
 
 ## Housekeeping
 

@@ -10,7 +10,7 @@
       "name": "cowork",
       "source": "./cowork",
       "description": "Bootstrap a lean instruction backbone (AGENTS.md, CLAUDE.md shim, MEMORY.md, conventions) into any project, extend it with workstations, rules, agents and skills by convention, audit it with a doctor, and close sessions with an end-of-session capture and git sync.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "license": "MIT",
       "homepage": "https://github.com/cabrerakevinc/cowork-skill"
     }
