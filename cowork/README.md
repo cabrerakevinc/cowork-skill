@@ -13,18 +13,53 @@ The idea in one paragraph: an agent should read a short entrypoint, a short memo
 
 ## Install
 
-**Cowork desktop (Claude app):** open the `.plugin` file and accept it. That is the whole install.
+**Cowork desktop app:** download `cowork.plugin` from the latest GitHub Release and open it in the Claude desktop app.
 
-**Claude Code (terminal):**
+**Claude Code:**
 
 ```
-/plugin marketplace add kevincabrera/cowork
-/plugin install cowork
+/plugin marketplace add cabrerakevinc/cowork-skill
+/plugin install cowork@cowork-skill
 ```
 
-**Sharing it:** send someone the `.plugin` file, or point them at this repo. Nothing in the plugin is tied to the author's projects; the templates speak in the owner's own first person and fill in from an interview.
+Update later with `/plugin marketplace update cowork-skill`, then reinstall.
 
-**Codex, Cursor, other Agent Skills readers:** the `skills/` folder follows the open Agent Skills layout (`skills/<name>/SKILL.md`). Point your skills installer at this repo, or copy `skills/*` into `~/.codex/skills/` (global) or `.agents/skills/` (per project). Verify the exact command against your tool's current docs.
+## The four commands
+
+### `/cowork:bootstrap`
+
+Run once per project or folder, from inside it. Detects what is already there (an existing CLAUDE.md, a README, nested repos), describes the project back to you in one paragraph, asks one round of questions with four options each and its recommendation first (purpose, tone, which starter rules to keep, what to do with existing instruction files, which optional resources to seed), shows the tree it will create, and writes the backbone only after you confirm. An existing CLAUDE.md is merged line by line, not overwritten: rules go to the entrypoint, facts to memory, long text to a resource file. Nothing about workstations is decided here.
+
+Two extra modes: `/cowork:bootstrap upgrade` refreshes a project's conventions file to the plugin's current version (or every project under a folder at once) and never overwrites a copy someone edited by hand. `/cowork:bootstrap adopt` adds only the conventions file to a workspace you built by hand before the plugin existed, touching nothing else.
+
+Say: "bootstrap this project", "set up Cowork OS here", "upgrade conventions for everything under ~/Code", "adopt this workspace".
+
+### `/cowork:extend`
+
+The one command for growing a workspace. Tell it what kind of work has started recurring and it builds the right shape, wires the table row and memory bullet, and runs the doctor. It reads the conventions file, so every addition comes out the same way.
+
+- **Workstation**: "create a Jira HQ for anything about our sprint tickets". You get `Jira HQ/CLAUDE.md` (Identity / Resources / Workflow / Editorial Rules), `MEMORY.md` (Contacts / Key Decisions), an empty `Jira HQ Resources/`, a Routing Map row, and a dated Active Projects bullet.
+- **Project** inside a workstation: "start a project in Jira HQ for the Q4 board migration, done when all boards are on the new template". You get `Jira HQ/Projects/q4-board-migration/PROJECT.md` (Brief / Status / Log) and a bullet in the workstation memory. Later: "archive the Q4 board migration project, outcome: shipped Oct 28" moves it to the workstation's Archive and leaves the folder in place.
+- **Scoped rule**: "add a rule for AWS work: read-only by default, mutating commands need a go, always state profile and region". You get `00_Resources/rules/aws.md` (at most 15 lines) and a row in the Rules table that agents read before touching AWS.
+- **Agent**: "create a tester agent that writes Jest tests and never edits application code". You get `00_Agents/tester.md` and generated copies for Claude Code and Codex.
+- **Tooling**: "add tooling". It detects the tools your project already uses (MCP configs, manifests, infra files), prefills a use-when / do-not-use-when table from your saved defaults, asks you to confirm once, and writes `00_Resources/tooling.md`. A workstation with its own tools ("add tooling for Automation Lab: n8n, Supabase") gets its own table.
+- **Skill**: "add a skill to Research HQ that exports the last answer as an HTML page". You get `Research HQ Resources/export-to-html/SKILL.md` and a Resources row.
+
+### `/cowork:doctor`
+
+A read-only reviewer of the structure. It never changes anything and never nags about optional pieces you chose not to have. It checks that every table row points at a real file and every file has a row, that nothing is over its size cap, that rules aren't repeated across files, that memory holds facts and not rules, that project folders are listed, that agent copies are in sync, that no secret-shaped string sits in a file the structure owns, and that the conventions file is current. It skips nested git repos and anything in `.coworkignore` or `.gitignore`.
+
+Say: "run the doctor", "audit this workspace", "is anything drifted". For many projects at once, point it at the parent folder: "check all my projects under ~/Code" gives one table with a row per workspace.
+
+### `/cowork:end-session`
+
+Run before you close a session. It scans the conversation for corrections you made, preferences you stated, decisions you took, and new facts, proposes where each should be saved (which file, which section, exact wording), writes only what you approve, then commits and pushes if the workspace is a git repo.
+
+## Example: three workstations, one week
+
+A content creator bootstraps a folder called `Studio`. Day one: "create a YouTube HQ for scripting, thumbnails, and publishing checklists" and "create a Sponsors HQ for brand outreach and rate cards". Day three, an editing gig comes in with a deadline: "start a project in YouTube HQ for the Acme launch video, done when the final cut is delivered". Day five: "add tooling for YouTube HQ: Descript, Notion, YouTube Studio". End of each day: `/cowork:end-session`. Each new session starts with the right HQ loaded and the right project's brief and log in front of it, and nothing from Sponsors HQ leaks into YouTube HQ.
+
+An engineer bootstraps a service repo instead: the existing CLAUDE.md gets merged, "add a rule for AWS work" and "create a tester agent" cover the risky parts, and `/cowork:doctor --all ~/Code` once a week keeps forty repos honest.
 
 ## What a bootstrapped project contains
 

@@ -2,6 +2,14 @@
 
 All notable changes to the `cowork` plugin. Versions follow semver: patch = tool fixes, minor = new capability, major = a command changes meaning. The conventions file installed into projects has its own version (noted per release); a minor conventions bump is additive and needs no action, a major one asks projects to run `/cowork:bootstrap upgrade`.
 
+## [Unreleased]
+
+## [0.2.1] - 2026-09-14
+
+### Changed
+- README: documented each slash command with what you say and what gets created, plus two end-to-end examples (a content studio with three workstations, an engineer's service repo).
+- Root README points desktop users at the latest GitHub Release for `cowork.plugin`.
+
 ## [0.2.0] - 2026-09-14
 
 Conventions 1.1 (additive; existing projects need no action).
